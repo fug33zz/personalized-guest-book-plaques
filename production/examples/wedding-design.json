@@ -1,10 +1,10 @@
 {
   "version": 1,
-  "templateId": "wedding-classic-v1",
+  "templateId": "wedding-heritage-v1",
   "names": "Camille & Morgan",
   "date": "11 April 2026",
   "font": "alex-brush",
-  "ornament": "rings",
+  "ornament": "heart",
   "border": "none",
   "baseColour": "charcoal",
   "detailColour": "gold"

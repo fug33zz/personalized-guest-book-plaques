@@ -37,8 +37,8 @@ describe('layout and validation', () => {
     expect(() => parseDesign({ ...defaultDesign, version: 2 })).toThrow(/version or template/i);
   });
 
-  it('defines four wedding templates with explicit eligibility', () => {
-    expect(templateList).toHaveLength(4);
+  it('defines ten wedding templates with explicit eligibility', () => {
+    expect(templateList).toHaveLength(10);
     for (const template of templateList) {
       expect(template.eligibility.fonts.length).toBeGreaterThan(0);
       expect(template.eligibility.ornaments).toContain(template.defaults.ornament);
@@ -47,17 +47,17 @@ describe('layout and validation', () => {
   });
 
   it('replaces ineligible elements when changing templates', () => {
-    const modern=designForTemplate(defaultDesign,'wedding-modern-v1');
-    expect(modern.font).toBe('bodoni');
-    expect(getTemplate(modern.templateId).eligibility.ornaments).toContain(modern.ornament);
-    expect(getTemplate(modern.templateId).eligibility.borders).toContain(modern.border);
+    const formal=designForTemplate(defaultDesign,'wedding-formal-frame-v1');
+    expect(formal.font).toBe('playfair');
+    expect(getTemplate(formal.templateId).eligibility.ornaments).toContain(formal.ornament);
+    expect(getTemplate(formal.templateId).eligibility.borders).toContain(formal.border);
   });
 
-  it('migrates legacy classic designs without element choices', () => {
-    const {ornament:unusedOrnament,border:unusedBorder,...legacy}=defaultDesign;
-    void unusedOrnament; void unusedBorder;
-    expect(parseDesign(legacy).ornament).toBe('rings');
-    expect(parseDesign(legacy).border).toBe('none');
+  it('migrates legacy template ids and retired ornaments', () => {
+    const migrated=parseDesign({...defaultDesign,templateId:'wedding-classic-v1',ornament:'rings'});
+    expect(migrated.templateId).toBe('wedding-heritage-v1');
+    expect(migrated.ornament).toBe('heart');
+    expect(migrated.border).toBe('none');
   });
 });
 
