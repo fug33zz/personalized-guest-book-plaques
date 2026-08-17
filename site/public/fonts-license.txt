@@ -7,7 +7,17 @@ Reserved Font Name: Lobster
 Montserrat
 Copyright 2011 The Montserrat Project Authors (https://github.com/JulietaUla/Montserrat)
 
-Both fonts are distributed under the SIL Open Font License, Version 1.1.
+Additional families:
+Alex Brush
+Allura
+Bodoni Moda
+Cinzel
+Cormorant Garamond
+Libre Baskerville
+Parisienne
+Playfair Display
+
+All fonts are distributed under the SIL Open Font License, Version 1.1. Package and upstream information is available at https://fontsource.org/.
 
 SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
 

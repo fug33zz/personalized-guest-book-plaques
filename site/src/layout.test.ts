@@ -48,7 +48,7 @@ describe('layout and validation', () => {
 
   it('replaces ineligible elements when changing templates', () => {
     const modern=designForTemplate(defaultDesign,'wedding-modern-v1');
-    expect(modern.font).toBe('modern');
+    expect(modern.font).toBe('bodoni');
     expect(getTemplate(modern.templateId).eligibility.ornaments).toContain(modern.ornament);
     expect(getTemplate(modern.templateId).eligibility.borders).toContain(modern.border);
   });
@@ -56,7 +56,7 @@ describe('layout and validation', () => {
   it('migrates legacy classic designs without element choices', () => {
     const {ornament:unusedOrnament,border:unusedBorder,...legacy}=defaultDesign;
     void unusedOrnament; void unusedBorder;
-    expect(parseDesign(legacy).ornament).toBe('heart');
+    expect(parseDesign(legacy).ornament).toBe('rings');
     expect(parseDesign(legacy).border).toBe('none');
   });
 });

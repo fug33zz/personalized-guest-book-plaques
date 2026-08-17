@@ -10,5 +10,13 @@
 .option-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:7px; }
 .option-grid button { padding:9px 7px; border:1px solid var(--line); border-radius:4px; background:transparent; cursor:pointer; font-size:10px; }
 .option-grid button.selected { border-color:var(--ink); background:var(--ink); color:#fff; }
+.choice-count { float:right; color:var(--muted); font-size:9px; font-weight:400; letter-spacing:0; text-transform:none; }
+.font-options { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; }
+.font-options button { display:flex; min-height:54px; padding:7px 9px; align-items:center; gap:9px; border:1px solid var(--line); border-radius:4px; background:transparent; cursor:pointer; text-align:left; }
+.font-options button>span { width:38px; color:var(--accent); font-size:23px; line-height:1; text-align:center; }
+.font-options small { min-width:0; font-size:9px; line-height:1.25; }
+.font-options em { display:block; margin-top:3px; color:var(--muted); font-size:8px; font-style:normal; }
+.font-options button.selected { border-color:var(--ink); background:var(--ink); color:#fff; }
+.font-options button.selected>span,.font-options button.selected em { color:#fff; }
 @media(max-width:920px) { .template-gallery { grid-template-columns:repeat(2,1fr); } }
 @media(max-width:560px) { .template-gallery { grid-template-columns:1fr 1fr; gap:8px; } .template-card { min-height:125px; padding:14px; } .template-mark { width:40px; height:40px; margin-bottom:14px; } .actions { grid-template-columns:1fr; } }

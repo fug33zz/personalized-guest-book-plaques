@@ -3,7 +3,8 @@ import { download3mf, generateBambu3mf } from './export3mf';
 import { parseDesign, validateDesign } from './layout';
 import { PlaquePreview } from './PlaquePreview';
 import { baseColours, borders, colours, defaultDesign, designForTemplate, detailColours, getTemplate, ornaments, templateList } from './template';
-import type { ColourId, PlaqueDesign, TemplateId } from './types';
+import type { ColourId, FontId, PlaqueDesign, TemplateId } from './types';
+import { fontCatalog } from './fonts';
 
 const storageKey='guest-book-plaque-design-v1';
 function loadStoredDesign():PlaqueDesign{try{const stored=localStorage.getItem(storageKey);return stored?parseDesign(JSON.parse(stored)):defaultDesign;}catch{return defaultDesign;}}
@@ -30,7 +31,7 @@ export default function App(){
       <aside className="controls" aria-label="Plaque controls">
         <div className="panel-heading"><div><span>Selected template</span><h2>{template.title}</h2><p>{template.description}</p></div><span className="step">{String(templateList.findIndex((item)=>item.id===template.id)+1).padStart(2,'0')}</span></div>
         <fieldset><legend>Personal details</legend><label htmlFor="names">Names <span>{[...design.names].length}/{template.fields.names.maxCharacters}</span></label><input id="names" aria-label="Names" value={design.names} maxLength={template.fields.names.maxCharacters} onChange={(event)=>update('names',event.target.value)} aria-invalid={Boolean(validation.errors.names)}/>{validation.errors.names&&<p className="error">{validation.errors.names}</p>}<label htmlFor="date">Event date <span>{[...design.date].length}/{template.fields.date.maxCharacters}</span></label><input id="date" aria-label="Event date" value={design.date} maxLength={template.fields.date.maxCharacters} onChange={(event)=>update('date',event.target.value)} aria-invalid={Boolean(validation.errors.date)}/>{validation.errors.date&&<p className="error">{validation.errors.date}</p>}</fieldset>
-        <OptionField label="Lettering style" values={template.eligibility.fonts} selected={design.font} labels={{elegant:'Lobster script',modern:'Montserrat'}} onChange={(value)=>update('font',value)}/>
+        <FontField values={template.eligibility.fonts} selected={design.font} onChange={(value)=>update('font',value)}/>
         <OptionField label="Ornament" values={template.eligibility.ornaments} selected={design.ornament} labels={ornaments} onChange={(value)=>update('ornament',value)}/>
         <OptionField label="Border" values={template.eligibility.borders} selected={design.border} labels={borders} onChange={(value)=>update('border',value)}/>
         {validation.errors.elements&&<p className="error">{validation.errors.elements}</p>}
@@ -43,4 +44,5 @@ export default function App(){
 }
 
 function OptionField<T extends string>({label,values,selected,labels,onChange}:{label:string;values:T[];selected:T;labels:Record<T,string>;onChange:(value:T)=>void}){return <fieldset><legend>{label}</legend><div className="option-grid">{values.map((value)=><button type="button" key={value} className={selected===value?'selected':''} onClick={()=>onChange(value)}>{labels[value]}</button>)}</div></fieldset>;}
+function FontField({values,selected,onChange}:{values:FontId[];selected:FontId;onChange:(value:FontId)=>void}){return <fieldset><legend>Lettering style <span className="choice-count">{values.length} curated</span></legend><div className="font-options">{values.map((value)=>{const font=fontCatalog[value];return <button type="button" key={value} aria-label={font.label} className={selected===value?'selected':''} onClick={()=>onChange(value)}><span style={{fontFamily:font.family,fontWeight:font.weight}}>Aa</span><small>{font.label}<em>{font.category}</em></small></button>;})}</div></fieldset>;}
 function ColourField({label,ids,selected,onChange}:{label:string;ids:ColourId[];selected:ColourId;onChange:(id:ColourId)=>void}){return <fieldset><legend>{label}</legend><div className="swatches">{ids.map((id)=><button type="button" key={id} className={selected===id?'selected':''} onClick={()=>onChange(id)} aria-label={`${colours[id].label}${selected===id?', selected':''}`}><span style={{background:colours[id].value}}/><small>{colours[id].label}</small></button>)}</div></fieldset>;}

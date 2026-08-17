@@ -12,8 +12,16 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@fontsource/alex-brush": "^5.3.0",
+    "@fontsource/allura": "^5.3.0",
+    "@fontsource/bodoni-moda": "^5.3.0",
+    "@fontsource/cinzel": "^5.3.0",
+    "@fontsource/cormorant-garamond": "^5.3.0",
+    "@fontsource/libre-baskerville": "^5.3.0",
     "@fontsource/lobster": "^5.3.0",
     "@fontsource/montserrat": "^5.3.0",
+    "@fontsource/parisienne": "^5.3.0",
+    "@fontsource/playfair-display": "^5.3.0",
     "earcut": "^3.2.3",
     "fflate": "^0.8.3",
     "opentype.js": "^2.0.0",

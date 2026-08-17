@@ -22,6 +22,14 @@ function loadFont(path: string) {
 const fonts = {
   elegant: loadFont(resolve('node_modules/@fontsource/lobster/files/lobster-latin-400-normal.woff')),
   modern: loadFont(resolve('node_modules/@fontsource/montserrat/files/montserrat-latin-600-normal.woff')),
+  cormorant:loadFont(resolve('node_modules/@fontsource/cormorant-garamond/files/cormorant-garamond-latin-600-normal.woff')),
+  playfair:loadFont(resolve('node_modules/@fontsource/playfair-display/files/playfair-display-latin-600-normal.woff')),
+  baskerville:loadFont(resolve('node_modules/@fontsource/libre-baskerville/files/libre-baskerville-latin-400-normal.woff')),
+  cinzel:loadFont(resolve('node_modules/@fontsource/cinzel/files/cinzel-latin-600-normal.woff')),
+  bodoni:loadFont(resolve('node_modules/@fontsource/bodoni-moda/files/bodoni-moda-latin-600-normal.woff')),
+  'alex-brush':loadFont(resolve('node_modules/@fontsource/alex-brush/files/alex-brush-latin-400-normal.woff')),
+  allura:loadFont(resolve('node_modules/@fontsource/allura/files/allura-latin-400-normal.woff')),
+  parisienne:loadFont(resolve('node_modules/@fontsource/parisienne/files/parisienne-latin-400-normal.woff')),
 };
 const mesh = buildWeddingMesh(design, fonts);
 mkdirSync(dirname(outputPath), { recursive: true });

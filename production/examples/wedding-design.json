@@ -3,7 +3,9 @@
   "templateId": "wedding-classic-v1",
   "names": "Camille & Morgan",
   "date": "11 April 2026",
-  "font": "elegant",
+  "font": "alex-brush",
+  "ornament": "rings",
+  "border": "none",
   "baseColour": "charcoal",
   "detailColour": "gold"
 }

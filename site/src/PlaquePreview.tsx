@@ -4,6 +4,7 @@ import { heartSvgPoints, leafPlacements, pointsAttribute, starPoints } from './d
 import { loadProductionFont } from './fontMetrics';
 import { deriveMonogram, fitText, fitTextWithMetrics, normalizedText } from './layout';
 import { colours, getTemplate } from './template';
+import { fontCatalog } from './fonts';
 import type { OrnamentId, PlaqueDesign } from './types';
 
 export function PlaquePreview({ design }: { design: PlaqueDesign }) {
@@ -21,8 +22,8 @@ export function PlaquePreview({ design }: { design: PlaqueDesign }) {
     ? fitTextWithMetrics(text, field, design.font, (value, fontSize) => font.getAdvanceWidth(value, fontSize, { kerning: true }), design.templateId)
     : fitText(text, field, design.font, design.templateId);
   const detail = colours[design.detailColour].value;
-  const fontFamily = design.font === 'elegant' ? 'Lobster, cursive' : 'Montserrat, sans-serif';
-  const fontWeight = design.font === 'modern' ? 600 : 400;
+  const fontFamily = fontCatalog[design.font].family;
+  const fontWeight = fontCatalog[design.font].weight;
   const anchor = (field: 'names' | 'date') => template.fields[field].align === 'left' ? 'start' : 'middle';
 
   return <figure className="preview-frame" aria-label="Live plaque preview">
