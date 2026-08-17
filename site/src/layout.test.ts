@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { fitText, normalizedText, parseDesign, validateDesign } from './layout';
-import { defaultDesign, weddingTemplate } from './template';
+import { defaultDesign, designForTemplate, getTemplate, templateList, weddingTemplate } from './template';
 
 describe('layout and validation', () => {
   it('normalizes whitespace without changing customer characters', () => {
@@ -26,6 +26,29 @@ describe('layout and validation', () => {
 
   it('rejects unknown template versions', () => {
     expect(() => parseDesign({ ...defaultDesign, version: 2 })).toThrow(/version or template/i);
+  });
+
+  it('defines four wedding templates with explicit eligibility', () => {
+    expect(templateList).toHaveLength(4);
+    for (const template of templateList) {
+      expect(template.eligibility.fonts.length).toBeGreaterThan(0);
+      expect(template.eligibility.ornaments).toContain(template.defaults.ornament);
+      expect(template.eligibility.borders).toContain(template.defaults.border);
+    }
+  });
+
+  it('replaces ineligible elements when changing templates', () => {
+    const modern=designForTemplate(defaultDesign,'wedding-modern-v1');
+    expect(modern.font).toBe('modern');
+    expect(getTemplate(modern.templateId).eligibility.ornaments).toContain(modern.ornament);
+    expect(getTemplate(modern.templateId).eligibility.borders).toContain(modern.border);
+  });
+
+  it('migrates legacy classic designs without element choices', () => {
+    const {ornament:unusedOrnament,border:unusedBorder,...legacy}=defaultDesign;
+    void unusedOrnament; void unusedBorder;
+    expect(parseDesign(legacy).ornament).toBe('heart');
+    expect(parseDesign(legacy).border).toBe('none');
   });
 });
 

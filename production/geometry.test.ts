@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import opentype from 'opentype.js';
 import { describe, expect, it } from 'vitest';
-import { defaultDesign } from '../site/src/template';
+import { defaultDesign, designForTemplate, templateList } from '../site/src/template';
 import { buildWeddingMesh } from './geometry';
 import { inspectBambuProject } from './bambu-project';
 
@@ -42,5 +42,12 @@ describe('production wedding geometry', () => {
     const second = buildWeddingMesh({ ...defaultDesign, names: 'Élodie & João' }, fonts);
     expect(second.vertices).not.toEqual(first.vertices);
     expect(second.triangles.length).not.toBe(first.triangles.length);
+  });
+
+  it.each(templateList)('builds the $title template within the shared physical envelope', (template) => {
+    const design=designForTemplate(defaultDesign,template.id);
+    const mesh=buildWeddingMesh(design,fonts);
+    expect(mesh.bounds()).toEqual({minimum:[0,0,0],maximum:[120,70,3]});
+    expect(mesh.triangles.some((triangle)=>triangle.painted)).toBe(true);
   });
 });

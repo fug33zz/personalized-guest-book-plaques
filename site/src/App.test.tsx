@@ -29,5 +29,14 @@ describe('editor', () => {
     render(<App />);
     expect(screen.getByRole('button', { name: 'Generate Bambu 3MF' })).toBeEnabled();
   });
+
+  it('switches templates and exposes only eligible parts', () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button',{name:/Modern frame/i}));
+    expect(screen.getByText('Clean & architectural')).toBeInTheDocument();
+    expect(screen.getByRole('button',{name:'Montserrat'})).toHaveClass('selected');
+    expect(screen.queryByRole('button',{name:'Lobster script'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button',{name:'Leaf sprigs'})).not.toBeInTheDocument();
+  });
 });
 
