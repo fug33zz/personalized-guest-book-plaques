@@ -1,0 +1,32 @@
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import opentype from 'opentype.js';
+import { parseDesign } from '../site/src/layout';
+import type { PlaqueDesign } from '../site/src/types';
+import { buildBambuProject, inspectBambuProject } from './bambu-project';
+import { buildWeddingMesh } from './geometry';
+
+function argument(name: string, fallback: string) {
+  const index = process.argv.indexOf(`--${name}`);
+  return resolve(index >= 0 && process.argv[index + 1] ? process.argv[index + 1] : fallback);
+}
+
+const designPath = argument('design', 'production/examples/wedding-design.json');
+const referencePath = argument('reference', 'models/calibration-plaque-V1.3mf');
+const outputPath = argument('output', 'models/production-output/personalized-wedding-plaque.3mf');
+const design = parseDesign(JSON.parse(readFileSync(designPath, 'utf8'))) as PlaqueDesign;
+function loadFont(path: string) {
+  const bytes = readFileSync(path);
+  return opentype.parse(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
+}
+const fonts = {
+  elegant: loadFont(resolve('node_modules/@fontsource/lobster/files/lobster-latin-400-normal.woff')),
+  modern: loadFont(resolve('node_modules/@fontsource/montserrat/files/montserrat-latin-600-normal.woff')),
+};
+const mesh = buildWeddingMesh(design, fonts);
+mkdirSync(dirname(outputPath), { recursive: true });
+const project = buildBambuProject(new Uint8Array(readFileSync(referencePath)), design, mesh);
+writeFileSync(outputPath, project);
+const report = inspectBambuProject(project);
+if (!report.paintOnlyAtTop || !report.accountMetadataAbsent || String(report.nozzle) !== '0.2' || String(report.penetration) !== '3') throw new Error(`Generated project failed validation: ${JSON.stringify(report)}`);
+console.log(JSON.stringify({ outputPath, design, ...report }, null, 2));

@@ -7,3 +7,5 @@ dist/
 site/dist/
 .env
 .env.*
+models/calibration-plaque-V1.3mf
+models/production-output/
