@@ -2,7 +2,7 @@
 
 An online product configurator for personalized, single-piece 3D-printed plaques that are glued to event guest books.
 
-The project is currently in its foundation phase. The first goal is to document the product clearly, validate manufacturing constraints, and create a small set of safe editable templates before committing to a fully flexible editor.
+The project currently has a working constrained editor and browser-side Bambu 3MF export. The wedding collection is the first multi-template catalogue; its production dimensions remain provisional until the physical books arrive.
 
 ## Product idea
 
@@ -19,6 +19,8 @@ Initial use cases include weddings, birthdays, retirements, anniversaries, baby 
 - `site/` — initial public project page and future editor shell
 - `.github/workflows/pages.yml` — GitHub Pages deployment
 - `references/` — source imagery supplied for design direction
+
+See `docs/WEDDING_TEMPLATE_CATALOGUE.md` for the wedding layouts and interchangeable-element rules.
 
 ## Local development
 
