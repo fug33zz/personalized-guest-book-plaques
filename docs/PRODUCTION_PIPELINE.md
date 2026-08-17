@@ -11,7 +11,7 @@ The editor and local production generator now share:
 - Heart and divider geometry
 - The versioned customer design JSON contract
 
-The browser remains a static public application. It never receives private Bambu machine profiles or account metadata.
+The browser remains a static public application. It downloads a sanitized Bambu project template containing the approved production settings, generates the personalized mesh locally in the customer's browser, validates the archive, and downloads the resulting 3MF. The template contains no Bambu account identifier.
 
 ## Fonts and licensing
 
@@ -23,7 +23,16 @@ The browser remains a static public application. It never receives private Bambu
 
 The production suitability of thin glyphs still requires physical print tests. Licensing approval does not imply manufacturing approval.
 
-## Generate a project
+## Generate in the editor
+
+1. Open the public editor.
+2. Personalize and validate the plaque.
+3. Select **Generate Bambu 3MF**.
+4. Open the downloaded project in Bambu Studio and slice it before printing.
+
+No design or personal text is uploaded to a server; generation runs in the browser.
+
+## Generate locally
 
 Save or copy a valid editor JSON file into the workspace, then run:
 
@@ -70,11 +79,11 @@ The generator retains the reference project's H2S printer, 0.2 mm nozzle, two PL
 
 Only the two displayed filament colours are updated from the editor design. Purge volumes remain those of the reference fixture and must be reviewed for each real filament pair.
 
-## Security boundary
+## Public template and privacy
 
-The reference project and generated production outputs are Git-ignored. This prevents the Bambu account identifier and private production configuration from entering the public repository.
+The original reference project and locally generated production outputs remain Git-ignored. A separately generated sanitized template is intentionally published at `site/public/templates/bambu-h2s-02mm-template.3mf` and contains the approved H2S, nozzle, process, material, ironing, purge, and colour-penetration settings.
 
-The generated outer model omits `DesignerUserId`, and automated inspection rejects generated projects when account metadata is found.
+The public template and generated outer models omit `DesignerUserId`. Automated inspection rejects generated projects when account metadata is found.
 
 ## Required manual acceptance
 
@@ -90,4 +99,4 @@ Every new geometry/font combination must still be opened and sliced in Bambu Stu
 - Appropriate purge volumes for the actual colours
 - Successful save/reopen round trip
 
-The generator is an internal prototype, not yet an unattended production service.
+The browser generator is a V1 prototype. It still requires Bambu Studio review and slicing before printing.

@@ -24,5 +24,10 @@ describe('editor', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Montserrat' }));
     expect(screen.getByRole('button', { name: 'Montserrat' })).toHaveClass('selected');
   });
+
+  it('offers direct Bambu project generation', () => {
+    render(<App />);
+    expect(screen.getByRole('button', { name: 'Generate Bambu 3MF' })).toBeEnabled();
+  });
 });
 

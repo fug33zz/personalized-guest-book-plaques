@@ -1,9 +1,9 @@
-import { mkdirSync, readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import opentype from 'opentype.js';
 import { parseDesign } from '../site/src/layout';
 import type { PlaqueDesign } from '../site/src/types';
-import { writeBambuProject, inspectBambuProject } from './bambu-project';
+import { buildBambuProject, inspectBambuProject } from './bambu-project';
 import { buildWeddingMesh } from './geometry';
 
 function argument(name: string, fallback: string) {
@@ -25,7 +25,8 @@ const fonts = {
 };
 const mesh = buildWeddingMesh(design, fonts);
 mkdirSync(dirname(outputPath), { recursive: true });
-writeBambuProject(referencePath, outputPath, design, mesh);
-const report = inspectBambuProject(outputPath);
+const project = buildBambuProject(new Uint8Array(readFileSync(referencePath)), design, mesh);
+writeFileSync(outputPath, project);
+const report = inspectBambuProject(project);
 if (!report.paintOnlyAtTop || !report.accountMetadataAbsent || String(report.nozzle) !== '0.2' || String(report.penetration) !== '3') throw new Error(`Generated project failed validation: ${JSON.stringify(report)}`);
 console.log(JSON.stringify({ outputPath, design, ...report }, null, 2));

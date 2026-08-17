@@ -13,8 +13,9 @@ The editor currently supports:
 - A proportional SVG preview and visible safe area
 - Local browser persistence
 - Versioned JSON design export and import
+- Direct browser-side Bambu 3MF generation and download
 
-It deliberately does not allow dragging, arbitrary resizing, uploads, checkout, customer accounts, or direct 3MF export.
+It deliberately does not allow dragging, arbitrary resizing, uploads, checkout, or customer accounts.
 
 ## Shared design contract
 
@@ -40,7 +41,7 @@ This is the contract between the customer interface and future production servic
 - `layout.ts` owns normalization, deterministic fitting, validation, and imported-file checks.
 - `PlaquePreview.tsx` renders the approved layout in physical SVG coordinates.
 - `App.tsx` owns the interface, persistence, and design-file workflow.
-- The future production service will accept the validated design contract and generate mesh/3MF output using the same template definition.
+- The browser exporter accepts the validated design contract and generates mesh/3MF output using the same template definition and a sanitized public Bambu project template.
 
 ## Typography warning
 

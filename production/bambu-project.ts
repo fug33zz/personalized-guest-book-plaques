@@ -1,4 +1,3 @@
-import { readFileSync, writeFileSync } from 'node:fs';
 import { unzipSync, zipSync } from 'fflate';
 import type { PlaqueDesign } from '../site/src/types';
 import { colours } from '../site/src/template';
@@ -46,8 +45,8 @@ function projectSettings(source: Uint8Array, design: PlaqueDesign) {
   return JSON.stringify(settings);
 }
 
-export function writeBambuProject(referencePath: string, outputPath: string, design: PlaqueDesign, mesh: MeshBuilder) {
-  const archive = unzipSync(new Uint8Array(readFileSync(referencePath)));
+export function buildBambuProject(referenceBytes: Uint8Array, design: PlaqueDesign, mesh: MeshBuilder) {
+  const archive = unzipSync(referenceBytes);
   const name = 'personalized-wedding-plaque.3mf';
   for (const entry of Object.keys(archive)) if (/^Metadata\/.*\.png$/i.test(entry)) delete archive[entry];
   archive['3D/Objects/object_1.model'] = text(objectXml(mesh));
@@ -55,11 +54,11 @@ export function writeBambuProject(referencePath: string, outputPath: string, des
   archive['Metadata/model_settings.config'] = text(modelSettings(name, mesh));
   archive['Metadata/plate_1.json'] = text(plateJson(name, mesh));
   archive['Metadata/project_settings.config'] = text(projectSettings(archive['Metadata/project_settings.config'], design));
-  writeFileSync(outputPath, zipSync(archive, { level: 9 }));
+  return zipSync(archive, { level: 9 });
 }
 
-export function inspectBambuProject(path: string) {
-  const archive = unzipSync(new Uint8Array(readFileSync(path)));
+export function inspectBambuProject(referenceBytes: Uint8Array) {
+  const archive = unzipSync(referenceBytes);
   const object = decoder.decode(archive['3D/Objects/object_1.model']);
   const settings = JSON.parse(decoder.decode(archive['Metadata/project_settings.config']));
   const vertices = [...object.matchAll(/<vertex x="([^"]+)" y="([^"]+)" z="([^"]+)"\/>/g)];

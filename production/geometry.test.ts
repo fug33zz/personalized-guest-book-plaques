@@ -4,6 +4,7 @@ import opentype from 'opentype.js';
 import { describe, expect, it } from 'vitest';
 import { defaultDesign } from '../site/src/template';
 import { buildWeddingMesh } from './geometry';
+import { inspectBambuProject } from './bambu-project';
 
 function loadFont(path: string) {
   const bytes = readFileSync(resolve(path));
@@ -16,6 +17,15 @@ const fonts = {
 };
 
 describe('production wedding geometry', () => {
+  it('publishes a sanitized and correctly configured browser template', () => {
+    const report=inspectBambuProject(new Uint8Array(readFileSync(resolve('site/public/templates/bambu-h2s-02mm-template.3mf'))));
+    expect(report.accountMetadataAbsent).toBe(true);
+    expect(report.printer).toBe('Bambu Lab H2S');
+    expect(String(report.nozzle)).toBe('0.2');
+    expect(String(report.penetration)).toBe('3');
+    expect(report.ironing).toBe('top');
+  });
+
   it.each(['elegant', 'modern'] as const)('creates bounded, painted geometry for %s', (font) => {
     const mesh = buildWeddingMesh({ ...defaultDesign, font }, fonts);
     const bounds = mesh.bounds();

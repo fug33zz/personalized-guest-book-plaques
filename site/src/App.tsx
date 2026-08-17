@@ -1,5 +1,6 @@
 import { type ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { PlaquePreview } from './PlaquePreview';
+import { download3mf, generateBambu3mf } from './export3mf';
 import { parseDesign, validateDesign } from './layout';
 import { baseColours, colours, defaultDesign, detailColours, weddingTemplate } from './template';
 import type { ColourId, FontId, PlaqueDesign } from './types';
@@ -10,11 +11,13 @@ function loadStoredDesign():PlaqueDesign{try{const stored=localStorage.getItem(s
 export default function App(){
   const[design,setDesign]=useState<PlaqueDesign>(loadStoredDesign);
   const[notice,setNotice]=useState('Changes save automatically on this device.');
+  const[generating,setGenerating]=useState(false);
   const fileInput=useRef<HTMLInputElement>(null);
   const validation=useMemo(()=>validateDesign(design),[design]);
   useEffect(()=>{if(validation.valid)localStorage.setItem(storageKey,JSON.stringify(design));},[design,validation.valid]);
   function update<K extends keyof PlaqueDesign>(key:K,value:PlaqueDesign[K]){setDesign((current)=>({...current,[key]:value}));setNotice('Changes save automatically on this device.');}
   function downloadDesign(){if(!validation.valid){setNotice('Resolve the highlighted fields before saving.');return;}const blob=new Blob([JSON.stringify(design,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const anchor=document.createElement('a');anchor.href=url;anchor.download='wedding-plaque-design.json';anchor.click();URL.revokeObjectURL(url);setNotice('Design file downloaded.');}
+  async function generateProject(){if(!validation.valid){setNotice('Resolve the highlighted fields before generating.');return;}setGenerating(true);setNotice('Building personalized Bambu project…');try{download3mf(await generateBambu3mf(design),design.names);setNotice('Personalized 3MF downloaded. Open and slice it in Bambu Studio before printing.');}catch(error){setNotice(error instanceof Error?error.message:'Could not generate the 3MF project.');}finally{setGenerating(false);}}
   async function importDesign(event:ChangeEvent<HTMLInputElement>){const file=event.target.files?.[0];if(!file)return;try{const imported=parseDesign(JSON.parse(await file.text()));setDesign(imported);setNotice(`Loaded ${file.name}.`);}catch(error){setNotice(error instanceof Error?error.message:'Could not load that design file.');}finally{event.target.value='';}}
   return <main className="app-shell">
     <header className="masthead"><a className="brand" href="#editor" aria-label="Plaque studio home"><span>Guest Book</span><strong>Plaque Studio</strong></a><p>Internal prototype · Wedding template 01</p></header>
@@ -30,7 +33,7 @@ export default function App(){
         <ColourField label="Plaque colour" ids={baseColours} selected={design.baseColour} onChange={(colour)=>update('baseColour',colour)}/>
         <ColourField label="Raised detail colour" ids={detailColours} selected={design.detailColour} onChange={(colour)=>update('detailColour',colour)}/>
         {validation.errors.colours&&<p className="error">{validation.errors.colours}</p>}
-        <div className="actions"><button type="button" className="primary" onClick={downloadDesign}>Save design file</button><button type="button" onClick={()=>fileInput.current?.click()}>Load design</button><button type="button" onClick={()=>{setDesign(defaultDesign);setNotice('Template reset.');}}>Reset</button><input ref={fileInput} className="visually-hidden" type="file" accept="application/json,.json" onChange={importDesign}/></div>
+        <div className="actions"><button type="button" className="primary" disabled={generating} onClick={generateProject}>{generating?'Generating 3MF…':'Generate Bambu 3MF'}</button><button type="button" onClick={downloadDesign}>Save design</button><button type="button" onClick={()=>fileInput.current?.click()}>Load design</button><button type="button" onClick={()=>{setDesign(defaultDesign);setNotice('Template reset.');}}>Reset</button><input ref={fileInput} className="visually-hidden" type="file" accept="application/json,.json" onChange={importDesign}/></div>
         <p className="notice" role="status">{notice}</p>
       </aside>
       <div className="workspace"><div className="workspace-heading"><div><span>Live preview</span><h2>Front face</h2></div><span className={validation.valid?'valid':'invalid'}>{validation.valid?'Design valid':'Needs attention'}</span></div><PlaquePreview design={design}/><div className="production-note"><span>Production rule</span><p>The dashed line marks the 8 mm safe area. Text scales automatically and cannot be moved outside the tested layout.</p></div></div>

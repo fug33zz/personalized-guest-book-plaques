@@ -31,7 +31,9 @@ The terminal prints the local editor URL. Run `npm test` for the constraint and 
 
 ## Generate a production test
 
-The local generator requires the private Bambu reference project at `models/calibration-plaque-V1.3mf`:
+The public editor now generates and downloads a sanitized Bambu-compatible 3MF directly in the browser. Customer text stays on the device.
+
+For local or batch generation, the command-line generator requires the original private Bambu reference project at `models/calibration-plaque-V1.3mf`:
 
 ```powershell
 npm.cmd run generate:3mf -- --design production/examples/wedding-design.json
