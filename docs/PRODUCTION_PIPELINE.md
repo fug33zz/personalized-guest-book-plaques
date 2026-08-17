@@ -68,14 +68,14 @@ npm.cmd run inspect:3mf -- models/production-output/modern-test.3mf
 4. Flatten glyph Bézier curves into printable contours.
 5. Classify outer contours and counters such as `O`, `A`, and `é`.
 6. Triangulate and extrude the plaque, text, heart, and dividers.
-7. Mark only raised top triangles as Bambu paint colour 2.
+7. Add one automatic tool change to filament 2 at the first raised-detail layer.
 8. Clone the private reference archive and replace geometry, placement, bounds, colours, and metadata.
 9. Remove preview images and account-bearing project metadata.
 10. Validate the resulting archive before reporting success.
 
 ## Preserved Bambu configuration
 
-The generator retains the reference project's H2S printer, 0.2 mm nozzle, two PLA profiles, plate, layer height, three walls, three top/bottom shells, infill, ironing, colour penetration, purge matrix, temperatures, speeds, and machine G-code.
+The generator retains the reference project's H2S printer, 0.2 mm nozzle, two PLA profiles, plate, layer height, three walls, three top/bottom shells, infill, ironing, purge matrix, temperatures, speeds, and machine G-code. It does not rely on surface-paint penetration: because every raised detail begins above the finished base, a single layer-boundary tool change colours the complete raised portion.
 
 Only the two displayed filament colours are updated from the editor design. Purge volumes remain those of the reference fixture and must be reviewed for each real filament pair.
 
@@ -92,8 +92,8 @@ Every new geometry/font combination must still be opened and sliced in Bambu Stu
 - No project repair or corruption warning
 - Correct dimensions and placement
 - Correct printer, nozzle, plate, and material profiles
-- Correct filament assignment on every raised top surface
-- Three-layer colour penetration
+- No painted mesh faces
+- One tool change to filament 2 at the first raised-detail layer
 - Legible counters and accents
 - No detached islands or strokes below the validated minimum
 - Appropriate purge volumes for the actual colours

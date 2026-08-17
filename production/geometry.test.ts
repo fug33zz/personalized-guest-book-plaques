@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { defaultDesign, designForTemplate, templateList } from '../site/src/template';
 import { fontIds } from '../site/src/fonts';
 import { buildWeddingMesh } from './geometry';
-import { inspectBambuProject } from './bambu-project';
+import { buildBambuProject, inspectBambuProject } from './bambu-project';
 
 function loadFont(path: string) {
   const bytes = readFileSync(resolve(path));
@@ -33,6 +33,15 @@ describe('production wedding geometry', () => {
     expect(String(report.nozzle)).toBe('0.2');
     expect(String(report.penetration)).toBe('3');
     expect(report.ironing).toBe('top');
+  });
+
+  it('exports an automatic filament change at the first raised-detail layer', () => {
+    const templateBytes=new Uint8Array(readFileSync(resolve('site/public/templates/bambu-h2s-02mm-template.3mf')));
+    const mesh=buildWeddingMesh(defaultDesign,fonts);
+    const report=inspectBambuProject(buildBambuProject(templateBytes,defaultDesign,mesh));
+    expect(report.paintedTriangles).toBe(0);
+    expect(report.layerHeight).toBe(.1);
+    expect(report.toolChangeTopZ).toBe(2.1);
   });
 
   it.each(fontIds)('creates bounded, painted geometry for %s', (font) => {

@@ -26,6 +26,6 @@ The wedding collection contains ten composition-led templates. Decorative geomet
 
 ## Production status
 
-All ten examples generate sanitized two-colour Bambu 3MF projects with the provisional profile. Automated inspection confirms top-only painting, three-layer colour penetration, top ironing, the 0.2 mm nozzle profile, and removal of account metadata.
+All ten examples generate sanitized two-colour Bambu 3MF projects with the provisional profile. Automated inspection confirms a single tool change at the first raised-detail layer, no painted mesh faces, top ironing, the 0.2 mm nozzle profile, and removal of account metadata.
 
 Dimensions, minimum strokes, clearances, and final material combinations remain provisional until physical book and print testing resumes.

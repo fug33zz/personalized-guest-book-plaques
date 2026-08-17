@@ -36,5 +36,5 @@ mkdirSync(dirname(outputPath), { recursive: true });
 const project = buildBambuProject(new Uint8Array(readFileSync(referencePath)), design, mesh);
 writeFileSync(outputPath, project);
 const report = inspectBambuProject(project);
-if (!report.paintOnlyAtTop || !report.accountMetadataAbsent || String(report.nozzle) !== '0.2' || String(report.penetration) !== '3') throw new Error(`Generated project failed validation: ${JSON.stringify(report)}`);
+if (report.paintedTriangles !== 0 || report.toolChangeTopZ !== 2.1 || !report.accountMetadataAbsent || String(report.nozzle) !== '0.2') throw new Error(`Generated project failed validation: ${JSON.stringify(report)}`);
 console.log(JSON.stringify({ outputPath, design, ...report }, null, 2));

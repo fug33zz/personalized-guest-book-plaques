@@ -11,7 +11,7 @@ export async function generateBambu3mf(design:PlaqueDesign){
   const mesh=buildWeddingMesh(design,{[design.font]:font});
   const project=buildBambuProject(new Uint8Array(template),design,mesh);
   const report=inspectBambuProject(project);
-  if(!report.paintOnlyAtTop||!report.accountMetadataAbsent||String(report.nozzle)!=='0.2'||String(report.penetration)!=='3')throw new Error('The generated project did not pass its safety checks.');
+  if(report.paintedTriangles!==0||report.toolChangeTopZ!==2.1||!report.accountMetadataAbsent||String(report.nozzle)!=='0.2')throw new Error('The generated project did not pass its safety checks.');
   return project;
 }
 

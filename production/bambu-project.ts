@@ -1,6 +1,6 @@
 import { unzipSync, zipSync } from 'fflate';
 import type { PlaqueDesign } from '../site/src/types';
-import { colours } from '../site/src/template';
+import { colours, getTemplate } from '../site/src/template';
 import type { MeshBuilder } from './mesh';
 
 const encoder = new TextEncoder();
@@ -10,8 +10,14 @@ const escapeXml = (value: string) => value.replaceAll('&', '&amp;').replaceAll('
 
 function objectXml(mesh: MeshBuilder) {
   const vertices = mesh.vertices.map(([x, y, z]) => `<vertex x="${x}" y="${y}" z="${z}"/>`).join('');
-  const triangles = mesh.triangles.map(({ a, b, c, painted }) => `<triangle v1="${a}" v2="${b}" v3="${c}"${painted ? ' paint_color="8"' : ''}/>`).join('');
+  const triangles = mesh.triangles.map(({ a, b, c }) => `<triangle v1="${a}" v2="${b}" v3="${c}"/>`).join('');
   return `<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" xmlns:BambuStudio="http://schemas.bambulab.com/package/2021" xmlns:p="http://schemas.microsoft.com/3dmanufacturing/production/2015/06" requiredextensions="p"><metadata name="BambuStudio:3mfVersion">1</metadata><resources><object id="1" p:UUID="00010000-81cb-4c03-9d28-80fed5dfa1dc" type="model"><mesh><vertices>${vertices}</vertices><triangles>${triangles}</triangles></mesh></object></resources></model>`;
+}
+
+function layerToolChangeXml(baseHeight: number, layerHeight: number) {
+  // Bambu records the top Z of the first layer printed with the new tool.
+  const firstDetailLayerTop = Number((baseHeight + layerHeight).toFixed(6));
+  return `<?xml version="1.0" encoding="utf-8"?><custom_gcodes_per_layer><plate><plate_info id="1"/><layer top_z="${firstDetailLayerTop}" type="2" extruder="2" color="" extra="" gcode=""/><mode value="MultiAsSingle"/></plate></custom_gcodes_per_layer>`;
 }
 function outerModelXml(height: number) {
   return `<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" xmlns:BambuStudio="http://schemas.bambulab.com/package/2021" xmlns:p="http://schemas.microsoft.com/3dmanufacturing/production/2015/06" requiredextensions="p"><metadata name="Application">BambuStudio-02.07.01.62</metadata><metadata name="BambuStudio:3mfVersion">1</metadata><metadata name="Title">Generated wedding plaque</metadata><resources><object id="2" p:UUID="00000001-61cb-4c03-9d28-80fed5dfa1dc" type="model"><components><component p:path="/3D/Objects/object_1.model" objectid="1" p:UUID="00010000-b206-40ff-9872-83e8017abed1" transform="1 0 0 0 1 0 0 0 1 0 0 0"/></components></object></resources><build p:UUID="2c7c17d8-22b5-4d84-8835-1976022ea369"><item objectid="2" p:UUID="00000002-b1ec-4553-aec9-835e5b724bb4" transform="1 0 0 0 1 0 0 0 1 170 160 ${height / 2}" printable="1"/></build></model>`;
@@ -48,11 +54,16 @@ function projectSettings(source: Uint8Array, design: PlaqueDesign) {
 export function buildBambuProject(referenceBytes: Uint8Array, design: PlaqueDesign, mesh: MeshBuilder) {
   const archive = unzipSync(referenceBytes);
   const name = 'personalized-wedding-plaque.3mf';
+  const settings = JSON.parse(decoder.decode(archive['Metadata/project_settings.config']));
+  const rawLayerHeight = Array.isArray(settings.layer_height) ? settings.layer_height[0] : settings.layer_height;
+  const layerHeight = Number(rawLayerHeight);
+  if (!(layerHeight > 0)) throw new Error('The Bambu template has no valid layer height.');
   for (const entry of Object.keys(archive)) if (/^Metadata\/.*\.png$/i.test(entry)) delete archive[entry];
   archive['3D/Objects/object_1.model'] = text(objectXml(mesh));
   archive['3D/3dmodel.model'] = text(outerModelXml(mesh.bounds().maximum[2]));
   archive['Metadata/model_settings.config'] = text(modelSettings(name, mesh));
   archive['Metadata/plate_1.json'] = text(plateJson(name, mesh));
+  archive['Metadata/custom_gcode_per_layer.xml'] = text(layerToolChangeXml(getTemplate(design.templateId).baseThicknessMm, layerHeight));
   archive['Metadata/project_settings.config'] = text(projectSettings(archive['Metadata/project_settings.config'], design));
   return zipSync(archive, { level: 9 });
 }
@@ -67,5 +78,7 @@ export function inspectBambuProject(referenceBytes: Uint8Array) {
   const zValues = vertices.map((vertex) => Number(vertex[3]));
   const maximumZ = Math.max(...zValues);
   const paintOnlyAtTop = painted.every((triangle) => [1,2,3].every((group) => Math.abs(zValues[Number(triangle[group])] - maximumZ) < 0.000001));
-  return { entries:Object.keys(archive).length, vertices:vertices.length, triangles:triangles.length, paintedTriangles:painted.length, paintOnlyAtTop, accountMetadataAbsent:!Object.values(archive).some((data) => decoder.decode(data).includes('DesignerUserId')), printer:settings.printer_model, nozzle:settings.nozzle_diameter, penetration:settings.top_color_penetration_layers, ironing:settings.ironing_type, filamentColours:settings.filament_colour };
+  const layerChanges = decoder.decode(archive['Metadata/custom_gcode_per_layer.xml'] ?? new Uint8Array());
+  const toolChange = layerChanges.match(/<layer top_z="([^"]+)" type="2" extruder="2"/);
+  return { entries:Object.keys(archive).length, vertices:vertices.length, triangles:triangles.length, paintedTriangles:painted.length, paintOnlyAtTop, toolChangeTopZ:toolChange ? Number(toolChange[1]) : null, accountMetadataAbsent:!Object.values(archive).some((data) => decoder.decode(data).includes('DesignerUserId')), printer:settings.printer_model, nozzle:settings.nozzle_diameter, layerHeight:Number(Array.isArray(settings.layer_height)?settings.layer_height[0]:settings.layer_height), penetration:settings.top_color_penetration_layers, ironing:settings.ironing_type, filamentColours:settings.filament_colour };
 }
