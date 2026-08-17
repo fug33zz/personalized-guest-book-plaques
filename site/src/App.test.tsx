@@ -32,7 +32,7 @@ describe('editor', () => {
 
   it('switches templates and exposes only eligible parts', () => {
     render(<App />);
-    fireEvent.click(screen.getByRole('button',{name:/Modern frame/i}));
+    fireEvent.click(screen.getByRole('button',{name:/Modern offset/i}));
     expect(screen.getByText('Clean & architectural')).toBeInTheDocument();
     expect(screen.getByRole('button',{name:'Montserrat'})).toHaveClass('selected');
     expect(screen.queryByRole('button',{name:'Lobster script'})).not.toBeInTheDocument();

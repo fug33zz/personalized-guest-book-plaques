@@ -13,6 +13,15 @@ describe('layout and validation', () => {
     expect(fitText('Alexandria & Maximilian-William', 'names', 'modern')).toBeLessThan(weddingTemplate.fields.names.maxFontSizeMm);
   });
 
+  it('adapts type size to each template text zone', () => {
+    for (const template of templateList) {
+      const short = fitText('Ana & Leo', 'names', template.defaults.font, template.id);
+      const long = fitText('Alexandria & Maximilian', 'names', template.defaults.font, template.id);
+      expect(long).toBeLessThanOrEqual(short);
+      expect(long).toBeGreaterThanOrEqual(template.fields.names.minFontSizeMm);
+    }
+  });
+
   it('rejects empty required fields and matching colours', () => {
     const result = validateDesign({ ...defaultDesign, names: '  ', baseColour: 'sage', detailColour: 'sage' });
     expect(result.valid).toBe(false);
