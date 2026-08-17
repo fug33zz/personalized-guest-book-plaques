@@ -46,9 +46,9 @@ function fittedSize(font: Font, text: string, field: 'names' | 'date', design: P
   return fitTextWithMetrics(text, field, design.font, (value, size) => font.getAdvanceWidth(value, size, { kerning: true }), design.templateId);
 }
 
-function addText(mesh: MeshBuilder, font: Font, text: string, baselineY: number, x: number, size: number) {
+function addText(mesh: MeshBuilder, font: Font, text: string, baselineY: number, x: number, size: number, align: 'center'|'left' = 'center') {
   const width = font.getAdvanceWidth(text, size, { kerning: true });
-  const path = font.getPath(text, x - width / 2, baselineY, size, { kerning: true });
+  const path = font.getPath(text, align === 'center' ? x - width / 2 : x, baselineY, size, { kerning: true });
   mesh.addPrism(commandsToContours(path.commands), 2, 1, true);
 }
 
@@ -59,9 +59,9 @@ export function buildWeddingMesh(design: PlaqueDesign, fonts: Record<PlaqueDesig
   const font = fonts[design.font];
   const names=normalizedText(design.names);
   const date=normalizedText(design.date);
-  if(template.layout==='monogram')addText(mesh,font,deriveMonogram(names),27,60,17);
-  addText(mesh,font,names,template.fields.names.baselineY,template.fields.names.x,fittedSize(font,names,'names',design));
-  addText(mesh,font,date,template.fields.date.baselineY,template.fields.date.x,fittedSize(font,date,'date',design));
+  if(template.layout==='monogram')addText(mesh,font,deriveMonogram(names),41,29,24);
+  addText(mesh,font,names,template.fields.names.baselineY,template.fields.names.x,fittedSize(font,names,'names',design),template.fields.names.align);
+  addText(mesh,font,date,template.fields.date.baselineY,template.fields.date.x,fittedSize(font,date,'date',design),template.fields.date.align);
   addBorder(mesh,design.border);
   addOrnament(mesh,design,template.layout);
   return mesh;
@@ -70,4 +70,16 @@ export function buildWeddingMesh(design: PlaqueDesign, fonts: Record<PlaqueDesig
 function addBorder(mesh:MeshBuilder,border:PlaqueDesign['border']){if(border==='none')return;for(const inset of border==='double'?[6,8.5]:[6]){const thickness=inset===6?.7:.4;mesh.addRectangle(inset,inset,120-2*inset,thickness,2,1,true);mesh.addRectangle(inset,70-inset-thickness,120-2*inset,thickness,2,1,true);mesh.addRectangle(inset,inset,thickness,70-2*inset,2,1,true);mesh.addRectangle(120-inset-thickness,inset,thickness,70-2*inset,2,1,true);}}
 function ellipse(cx:number,cy:number,rx:number,ry:number,angle=0,segments=24):Point[]{const rotation=angle*Math.PI/180;return Array.from({length:segments},(_,index)=>{const theta=2*Math.PI*index/segments;const x=rx*Math.cos(theta),y=ry*Math.sin(theta);return[cx+x*Math.cos(rotation)-y*Math.sin(rotation),70-(cy+x*Math.sin(rotation)+y*Math.cos(rotation))] as Point;});}
 function rectangle(cx:number,cy:number,width:number,height:number,angle=0):Point[]{const rotation=angle*Math.PI/180;return[[-width/2,-height/2],[width/2,-height/2],[width/2,height/2],[-width/2,height/2]].map(([x,y])=>[cx+x*Math.cos(rotation)-y*Math.sin(rotation),70-(cy+x*Math.sin(rotation)+y*Math.cos(rotation))] as Point);}
-function addOrnament(mesh:MeshBuilder,design:PlaqueDesign,layout:string){const y=layout==='modern'?54:layout==='botanical'?57:39;if(layout==='classic'){mesh.addRectangle(24,70-39.4,27,.8,2,1,true);mesh.addRectangle(69,70-39.4,27,.8,2,1,true);}if(design.ornament==='none')return;if(design.ornament==='heart'){mesh.addPrism([heartPoints.map(([x,pointY]):Point=>[x,70-(pointY+y-39)])],2,1,true);return;}if(design.ornament==='rings'){mesh.addPrism([ellipse(57.5,y,4,4),ellipse(57.5,y,2.8,2.8).reverse()],2,1,true);mesh.addPrism([ellipse(62.5,y,4,4),ellipse(62.5,y,2.8,2.8).reverse()],2,1,true);return;}if(design.ornament==='stars'){for(const[x,outer,inner]of[[54,1.8,.75],[60,2.7,1.1],[66,1.8,.75]])mesh.addPrism([starPoints(x,y,outer,inner).map(([px,py]):Point=>[px,70-py])],2,1,true);return;}for(const leaf of leafPlacements)mesh.addPrism([ellipse(leaf.x,leaf.y,4.2,1.6,leaf.angle)],2,1,true);mesh.addPrism([rectangle(24,34,31,.8,54)],2,1,true);mesh.addPrism([rectangle(96,34,31,.8,-54)],2,1,true);}
+function addOrnament(mesh:MeshBuilder,design:PlaqueDesign,layout:string){
+  if(layout==='classic'){mesh.addRectangle(25,70-39.325,26,.65,2,1,true);mesh.addRectangle(69,70-39.325,26,.65,2,1,true);}
+  if(layout==='monogram'){mesh.addRectangle(52,70-54.275,18,.55,2,1,true);mesh.addRectangle(90,70-54.275,18,.55,2,1,true);}
+  if(design.ornament==='none')return;
+  if(design.ornament==='botanical'){
+    for(const leaf of leafPlacements)mesh.addPrism([ellipse(leaf.x,leaf.y,3.7,1.35,leaf.angle)],2,1,true);
+    mesh.addPrism([rectangle(17.5,20.5,22,.65,48)],2,1,true);mesh.addPrism([rectangle(102.5,49.5,22,.65,48)],2,1,true);return;
+  }
+  const position=layout==='modern'?{x:97,y:36}:layout==='monogram'?{x:80,y:54}:layout==='botanical'?{x:60,y:56}:{x:60,y:39};
+  if(design.ornament==='heart'){mesh.addPrism([heartPoints.map(([x,y]):Point=>[x+position.x-60,70-(y+position.y-39)])],2,1,true);return;}
+  if(design.ornament==='rings'){mesh.addPrism([ellipse(position.x-2.5,position.y,3.7,3.7),ellipse(position.x-2.5,position.y,2.6,2.6).reverse()],2,1,true);mesh.addPrism([ellipse(position.x+2.5,position.y,3.7,3.7),ellipse(position.x+2.5,position.y,2.6,2.6).reverse()],2,1,true);return;}
+  for(const[offset,outer,inner]of[[-6,1.6,.7],[0,2.5,1],[6,1.6,.7]])mesh.addPrism([starPoints(position.x+offset,position.y,outer,inner).map(([x,y]):Point=>[x,70-y])],2,1,true);
+}
