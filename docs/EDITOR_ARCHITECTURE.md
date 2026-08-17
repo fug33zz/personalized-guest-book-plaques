@@ -2,12 +2,13 @@
 
 ## First milestone
 
-The internal prototype implements one constrained wedding plaque measuring 120 × 70 mm, with a 2 mm base and 1 mm raised details.
+The internal prototype implements ten constrained wedding compositions in a provisional 120 × 70 mm envelope, with a 2 mm base and 1 mm raised details.
 
 The editor currently supports:
 
 - Names and event date with required-field and character-count validation
-- Two controlled lettering styles
+- Ten production-compatible lettering styles, curated per template
+- Integrated template decoration plus an optional approved heart
 - Approved base and raised-detail colour palettes
 - Deterministic automatic text fitting
 - A proportional SVG preview and visible safe area
@@ -24,10 +25,12 @@ The editor stores customer choices in a small versioned object:
 ```json
 {
   "version": 1,
-  "templateId": "wedding-classic-v1",
+  "templateId": "wedding-heritage-v1",
   "names": "Camille & Morgan",
   "date": "11 April 2026",
-  "font": "elegant",
+  "font": "alex-brush",
+  "ornament": "heart",
+  "border": "none",
   "baseColour": "charcoal",
   "detailColour": "gold"
 }
@@ -37,7 +40,8 @@ This is the contract between the customer interface and future production servic
 
 ## Boundaries
 
-- `template.ts` owns physical size, field constraints, approved colours, and defaults.
+- `template.ts` owns the catalogue, physical size, text zones, eligibility, approved colours, and defaults.
+- `decorations.ts` defines shared primitives consumed by both preview and 3MF geometry.
 - `layout.ts` owns normalization, deterministic fitting, validation, and imported-file checks.
 - `PlaquePreview.tsx` renders the approved layout in physical SVG coordinates.
 - `App.tsx` owns the interface, persistence, and design-file workflow.

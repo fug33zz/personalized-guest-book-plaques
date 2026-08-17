@@ -32,9 +32,9 @@ describe('editor', () => {
 
   it('switches templates and exposes only eligible parts', () => {
     render(<App />);
-    fireEvent.click(screen.getByRole('button',{name:/Editorial modern/i}));
-    expect(screen.getByText('Bold & architectural')).toBeInTheDocument();
-    expect(screen.getByRole('button',{name:'Bodoni Moda'})).toHaveClass('selected');
+    fireEvent.click(screen.getByRole('button',{name:/Formal frame/i}));
+    expect(screen.getByText('Classic & refined')).toBeInTheDocument();
+    expect(screen.getByRole('button',{name:'Playfair Display'})).toHaveClass('selected');
     expect(screen.queryByRole('button',{name:'Lobster'})).not.toBeInTheDocument();
     expect(screen.queryByRole('button',{name:'Leaf sprigs'})).not.toBeInTheDocument();
   });

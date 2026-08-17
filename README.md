@@ -45,5 +45,5 @@ Generated projects are written under `models/production-output/` and intentional
 
 ## Status
 
-The first internal editor prototype is in development using a constrained 120 × 70 mm wedding template. Physical dimensions, materials, production fonts, pricing, fulfilment, and automated 3MF output still need validation.
+The wedding editor now contains ten constrained templates, ten curated production fonts, integrated decoration, and direct browser-side 3MF output. Physical dimensions, material pairings, pricing, and fulfilment still need validation against the books and physical prints.
 
