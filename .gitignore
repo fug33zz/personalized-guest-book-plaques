@@ -4,5 +4,6 @@ Thumbs.db
 .vscode/
 node_modules/
 dist/
+site/dist/
 .env
 .env.*
