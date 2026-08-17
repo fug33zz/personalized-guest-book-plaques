@@ -1,4 +1,4 @@
-export type FontId = 'elegant' | 'modern';
+export type FontId = 'elegant'|'modern'|'cormorant'|'playfair'|'baskerville'|'cinzel'|'bodoni'|'alex-brush'|'allura'|'parisienne';
 export type ColourId = 'charcoal' | 'ivory' | 'navy' | 'sage' | 'gold' | 'silver';
 export type TemplateId = 'wedding-classic-v1' | 'wedding-botanical-v1' | 'wedding-modern-v1' | 'wedding-monogram-v1';
 export type OrnamentId = 'heart' | 'rings' | 'stars' | 'botanical' | 'none';

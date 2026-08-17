@@ -4,12 +4,11 @@ import { loadProductionFont } from './fontMetrics';
 import type { PlaqueDesign } from './types';
 
 export async function generateBambu3mf(design:PlaqueDesign){
-  const[template,elegant,modern]=await Promise.all([
+  const[template,font]=await Promise.all([
     fetch(`${import.meta.env.BASE_URL}templates/bambu-h2s-02mm-template.3mf`).then((response)=>{if(!response.ok)throw new Error('Could not load the Bambu project template.');return response.arrayBuffer();}),
-    loadProductionFont('elegant'),
-    loadProductionFont('modern'),
+    loadProductionFont(design.font),
   ]);
-  const mesh=buildWeddingMesh(design,{elegant,modern});
+  const mesh=buildWeddingMesh(design,{[design.font]:font});
   const project=buildBambuProject(new Uint8Array(template),design,mesh);
   const report=inspectBambuProject(project);
   if(!report.paintOnlyAtTop||!report.accountMetadataAbsent||String(report.nozzle)!=='0.2'||String(report.penetration)!=='3')throw new Error('The generated project did not pass its safety checks.');

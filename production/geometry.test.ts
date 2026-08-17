@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import opentype from 'opentype.js';
 import { describe, expect, it } from 'vitest';
 import { defaultDesign, designForTemplate, templateList } from '../site/src/template';
+import { fontIds } from '../site/src/fonts';
 import { buildWeddingMesh } from './geometry';
 import { inspectBambuProject } from './bambu-project';
 
@@ -14,6 +15,14 @@ function loadFont(path: string) {
 const fonts = {
   elegant: loadFont('node_modules/@fontsource/lobster/files/lobster-latin-400-normal.woff'),
   modern: loadFont('node_modules/@fontsource/montserrat/files/montserrat-latin-600-normal.woff'),
+  cormorant:loadFont('node_modules/@fontsource/cormorant-garamond/files/cormorant-garamond-latin-600-normal.woff'),
+  playfair:loadFont('node_modules/@fontsource/playfair-display/files/playfair-display-latin-600-normal.woff'),
+  baskerville:loadFont('node_modules/@fontsource/libre-baskerville/files/libre-baskerville-latin-400-normal.woff'),
+  cinzel:loadFont('node_modules/@fontsource/cinzel/files/cinzel-latin-600-normal.woff'),
+  bodoni:loadFont('node_modules/@fontsource/bodoni-moda/files/bodoni-moda-latin-600-normal.woff'),
+  'alex-brush':loadFont('node_modules/@fontsource/alex-brush/files/alex-brush-latin-400-normal.woff'),
+  allura:loadFont('node_modules/@fontsource/allura/files/allura-latin-400-normal.woff'),
+  parisienne:loadFont('node_modules/@fontsource/parisienne/files/parisienne-latin-400-normal.woff'),
 };
 
 describe('production wedding geometry', () => {
@@ -26,7 +35,7 @@ describe('production wedding geometry', () => {
     expect(report.ironing).toBe('top');
   });
 
-  it.each(['elegant', 'modern'] as const)('creates bounded, painted geometry for %s', (font) => {
+  it.each(fontIds)('creates bounded, painted geometry for %s', (font) => {
     const mesh = buildWeddingMesh({ ...defaultDesign, font }, fonts);
     const bounds = mesh.bounds();
     expect(bounds.minimum).toEqual([0, 0, 0]);

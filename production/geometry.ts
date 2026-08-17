@@ -1,7 +1,7 @@
 import type { Font, PathCommand } from 'opentype.js';
 import { deriveMonogram, fitTextWithMetrics, normalizedText } from '../site/src/layout';
 import { getTemplate } from '../site/src/template';
-import type { PlaqueDesign } from '../site/src/types';
+import type { FontId, PlaqueDesign } from '../site/src/types';
 import { heartPoints, leafPlacements, starPoints } from '../site/src/decorations';
 import { MeshBuilder, roundedRectangle, type Point } from './mesh';
 
@@ -52,11 +52,12 @@ function addText(mesh: MeshBuilder, font: Font, text: string, baselineY: number,
   mesh.addPrism(commandsToContours(path.commands), 2, 1, true);
 }
 
-export function buildWeddingMesh(design: PlaqueDesign, fonts: Record<PlaqueDesign['font'], Font>) {
+export function buildWeddingMesh(design: PlaqueDesign, fonts: Partial<Record<FontId, Font>>) {
   const template=getTemplate(design.templateId);
   const mesh = new MeshBuilder();
   mesh.addPrism([roundedRectangle(120, 70, 4)], 0, template.baseThicknessMm, false);
   const font = fonts[design.font];
+  if(!font)throw new Error(`Production font ${design.font} is not loaded.`);
   const names=normalizedText(design.names);
   const date=normalizedText(design.date);
   if(template.layout==='monogram')addText(mesh,font,deriveMonogram(names),41,29,24);

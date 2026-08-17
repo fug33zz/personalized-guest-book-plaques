@@ -21,8 +21,8 @@ describe('editor', () => {
 
   it('switches between approved lettering styles', () => {
     render(<App />);
-    fireEvent.click(screen.getByRole('button', { name: 'Montserrat' }));
-    expect(screen.getByRole('button', { name: 'Montserrat' })).toHaveClass('selected');
+    fireEvent.click(screen.getByRole('button', { name: 'Cormorant Garamond' }));
+    expect(screen.getByRole('button', { name: 'Cormorant Garamond' })).toHaveClass('selected');
   });
 
   it('offers direct Bambu project generation', () => {
@@ -32,10 +32,10 @@ describe('editor', () => {
 
   it('switches templates and exposes only eligible parts', () => {
     render(<App />);
-    fireEvent.click(screen.getByRole('button',{name:/Modern offset/i}));
-    expect(screen.getByText('Clean & architectural')).toBeInTheDocument();
-    expect(screen.getByRole('button',{name:'Montserrat'})).toHaveClass('selected');
-    expect(screen.queryByRole('button',{name:'Lobster script'})).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button',{name:/Editorial modern/i}));
+    expect(screen.getByText('Bold & architectural')).toBeInTheDocument();
+    expect(screen.getByRole('button',{name:'Bodoni Moda'})).toHaveClass('selected');
+    expect(screen.queryByRole('button',{name:'Lobster'})).not.toBeInTheDocument();
     expect(screen.queryByRole('button',{name:'Leaf sprigs'})).not.toBeInTheDocument();
   });
 });
