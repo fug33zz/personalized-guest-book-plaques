@@ -20,15 +20,16 @@ Initial use cases include weddings, birthdays, retirements, anniversaries, baby 
 - `.github/workflows/pages.yml` — GitHub Pages deployment
 - `references/` — source imagery supplied for design direction
 
-## Local preview
+## Local development
 
 ```powershell
-python -m http.server 8080 --directory site
+npm install
+npm run dev
 ```
 
-Then visit `http://localhost:8080`.
+The terminal prints the local editor URL. Run `npm test` for the constraint and interface tests, and `npm run build` for the production bundle.
 
 ## Status
 
-Foundation only. Dimensions, materials, fonts, template rules, export format, pricing, fulfilment workflow, and editor architecture still need validation.
+The first internal editor prototype is in development using a constrained 120 × 70 mm wedding template. Physical dimensions, materials, production fonts, pricing, fulfilment, and automated 3MF output still need validation.
 
