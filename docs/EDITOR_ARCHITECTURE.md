@@ -44,12 +44,12 @@ This is the contract between the customer interface and future production servic
 
 ## Typography warning
 
-The current elegant and modern choices use system font stacks and are suitable for interaction testing only. Production requires commercially licensed, bundled font files. Those exact files must be used both in the browser and by the geometry generator before preview-to-print matching can be claimed.
+The editor now self-hosts Lobster 400 and Montserrat 600 under the SIL Open Font License 1.1. The local production generator parses the same font binaries. Browser and generator use the same font advance-width fitting calculation and shared decorative geometry.
 
 ## Next technical milestone
 
-1. Select and bundle production font files.
-2. Convert text and decorations into deterministic vector paths.
-3. Share those paths between SVG preview and 3D extrusion.
-4. Connect the validated JSON design to the proven Bambu 3MF packaging pipeline.
-5. Compare browser preview, generated mesh, Bambu slice, and physical print.
+1. Open and slice the generated script, accented, and modern test projects in Bambu Studio.
+2. Compare browser preview, generated mesh, Bambu slice, and physical print.
+3. Measure minimum printable strokes for both fonts and encode those limits.
+4. Review purge volumes for every approved filament pairing.
+5. Move the local generator behind an authenticated production service when the workflow is proven.

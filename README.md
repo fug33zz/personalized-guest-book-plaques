@@ -29,6 +29,16 @@ npm run dev
 
 The terminal prints the local editor URL. Run `npm test` for the constraint and interface tests, and `npm run build` for the production bundle.
 
+## Generate a production test
+
+The local generator requires the private Bambu reference project at `models/calibration-plaque-V1.3mf`:
+
+```powershell
+npm.cmd run generate:3mf -- --design production/examples/wedding-design.json
+```
+
+Generated projects are written under `models/production-output/` and intentionally excluded from Git. See `docs/PRODUCTION_PIPELINE.md` for the architecture, validation, and Bambu Studio acceptance checklist.
+
 ## Status
 
 The first internal editor prototype is in development using a constrained 120 × 70 mm wedding template. Physical dimensions, materials, production fonts, pricing, fulfilment, and automated 3MF output still need validation.

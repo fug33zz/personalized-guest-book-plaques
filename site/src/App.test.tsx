@@ -21,8 +21,8 @@ describe('editor', () => {
 
   it('switches between approved lettering styles', () => {
     render(<App />);
-    fireEvent.click(screen.getByRole('button', { name: 'Modern clean' }));
-    expect(screen.getByRole('button', { name: 'Modern clean' })).toHaveClass('selected');
+    fireEvent.click(screen.getByRole('button', { name: 'Montserrat' }));
+    expect(screen.getByRole('button', { name: 'Montserrat' })).toHaveClass('selected');
   });
 });
 
