@@ -3,7 +3,6 @@ import { fitTextWithMetrics, normalizedText } from '../site/src/layout';
 import { getTemplate } from '../site/src/template';
 import type { FontId, PlaqueDesign } from '../site/src/types';
 import { decorationForLayout, heartPoints } from '../site/src/decorations';
-import { textExpansionForFont } from '../site/src/fonts';
 import { MeshBuilder, roundedRectangle, type Point } from './mesh';
 
 function curveSteps(points: Point[], tolerance = 0.45) {
@@ -47,31 +46,10 @@ function fittedSize(font: Font, text: string, field: 'names' | 'date', design: P
   return fitTextWithMetrics(text, field, design.font, (value, size) => font.getAdvanceWidth(value, size, { kerning: true }), design.templateId);
 }
 
-function contourArea(points:Point[]){return points.reduce((area,current,index)=>{const next=points[(index+1)%points.length];return area+current[0]*next[1]-next[0]*current[1];},0)/2;}
-
-export function expandTextContours(contours:Point[][],amount:number){
-  if(amount<=0||!contours.length)return contours;
-  const largest=contours.reduce((best,contour)=>Math.abs(contourArea(contour))>Math.abs(contourArea(best))?contour:best);
-  const filledSign=Math.sign(contourArea(largest))||1;
-  return contours.map((contour)=>contour.map((point,index)=>{
-    const previous=contour[(index+contour.length-1)%contour.length],next=contour[(index+1)%contour.length];
-    const previousLength=Math.hypot(point[0]-previous[0],point[1]-previous[1])||1;
-    const nextLength=Math.hypot(next[0]-point[0],next[1]-point[1])||1;
-    const previousNormal:[number,number]=[filledSign*(point[1]-previous[1])/previousLength,-filledSign*(point[0]-previous[0])/previousLength];
-    const nextNormal:[number,number]=[filledSign*(next[1]-point[1])/nextLength,-filledSign*(next[0]-point[0])/nextLength];
-    const sumX=previousNormal[0]+nextNormal[0],sumY=previousNormal[1]+nextNormal[1],sumLength=Math.hypot(sumX,sumY);
-    if(sumLength<1e-6)return[point[0]+nextNormal[0]*amount,point[1]+nextNormal[1]*amount] as Point;
-    const bisector:[number,number]=[sumX/sumLength,sumY/sumLength];
-    const denominator=Math.max(.34,Math.abs(bisector[0]*nextNormal[0]+bisector[1]*nextNormal[1]));
-    const distance=Math.min(amount/denominator,amount*3);
-    return[point[0]+bisector[0]*distance,point[1]+bisector[1]*distance] as Point;
-  }));
-}
-
-function addText(mesh: MeshBuilder, font: Font, fontId:FontId, text: string, baselineY: number, x: number, size: number, align: 'center'|'left' = 'center') {
+function addText(mesh: MeshBuilder, font: Font, text: string, baselineY: number, x: number, size: number, align: 'center'|'left' = 'center') {
   const width = font.getAdvanceWidth(text, size, { kerning: true });
   const path = font.getPath(text, align === 'center' ? x - width / 2 : x, baselineY, size, { kerning: true });
-  mesh.addPrism(expandTextContours(commandsToContours(path.commands),textExpansionForFont(fontId)), 2, 1, true);
+  mesh.addPrism(commandsToContours(path.commands), 2, 1, true);
 }
 
 export function buildWeddingMesh(design: PlaqueDesign, fonts: Partial<Record<FontId, Font>>) {
@@ -82,8 +60,8 @@ export function buildWeddingMesh(design: PlaqueDesign, fonts: Partial<Record<Fon
   if(!font)throw new Error(`Production font ${design.font} is not loaded.`);
   const names=normalizedText(design.names);
   const date=normalizedText(design.date);
-  addText(mesh,font,design.font,names,template.fields.names.baselineY,template.fields.names.x,fittedSize(font,names,'names',design),template.fields.names.align);
-  addText(mesh,font,design.font,date,template.fields.date.baselineY,template.fields.date.x,fittedSize(font,date,'date',design),template.fields.date.align);
+  addText(mesh,font,names,template.fields.names.baselineY,template.fields.names.x,fittedSize(font,names,'names',design),template.fields.names.align);
+  addText(mesh,font,date,template.fields.date.baselineY,template.fields.date.x,fittedSize(font,date,'date',design),template.fields.date.align);
   addBorder(mesh,design.border);
   addDecoration(mesh,design);
   return mesh;

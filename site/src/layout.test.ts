@@ -22,6 +22,13 @@ describe('layout and validation', () => {
     }
   });
 
+  it('keeps celebration dates large enough to print without changing typeface', () => {
+    expect(fitText('11 April 2026', 'date', 'alex-brush', 'wedding-heritage-v1')).toBe(8);
+    for (const template of templateList) {
+      expect(template.fields.date.minFontSizeMm).toBeGreaterThanOrEqual(4.2);
+    }
+  });
+
   it('rejects empty required fields and matching colours', () => {
     const result = validateDesign({ ...defaultDesign, names: '  ', baseColour: 'sage', detailColour: 'sage' });
     expect(result.valid).toBe(false);

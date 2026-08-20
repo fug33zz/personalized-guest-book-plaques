@@ -4,7 +4,7 @@ import opentype from 'opentype.js';
 import { describe, expect, it } from 'vitest';
 import { defaultDesign, designForTemplate, templateList } from '../site/src/template';
 import { fontIds } from '../site/src/fonts';
-import { buildWeddingMesh, expandTextContours } from './geometry';
+import { buildWeddingMesh } from './geometry';
 import { buildBambuProject, inspectBambuProject } from './bambu-project';
 
 function loadFont(path: string) {
@@ -26,16 +26,6 @@ const fonts = {
 };
 
 describe('production wedding geometry', () => {
-  it('expands outer text strokes while shrinking counters',()=>{
-    const outer:[[number,number],[number,number],[number,number],[number,number]]=[[0,0],[10,0],[10,10],[0,10]];
-    const hole:[[number,number],[number,number],[number,number],[number,number]]=[[3,3],[3,7],[7,7],[7,3]];
-    const [expandedOuter,expandedHole]=expandTextContours([outer,hole],.3);
-    expect(Math.min(...expandedOuter.map(([x])=>x))).toBeLessThan(0);
-    expect(Math.max(...expandedOuter.map(([x])=>x))).toBeGreaterThan(10);
-    expect(Math.min(...expandedHole.map(([x])=>x))).toBeGreaterThan(3);
-    expect(Math.max(...expandedHole.map(([x])=>x))).toBeLessThan(7);
-  });
-
   it('publishes a sanitized and correctly configured browser template', () => {
     const report=inspectBambuProject(new Uint8Array(readFileSync(resolve('site/public/templates/bambu-h2s-02mm-template.3mf'))));
     expect(report.accountMetadataAbsent).toBe(true);
