@@ -4,7 +4,7 @@ import { decorationForLayout, heartPoints, pointsAttribute } from './decorations
 import { loadProductionFont } from './fontMetrics';
 import { fitText, fitTextWithMetrics, normalizedText } from './layout';
 import { colours, getTemplate } from './template';
-import { fontCatalog } from './fonts';
+import { fontCatalog, textExpansionForFont } from './fonts';
 import type { PlaqueDesign, PlaqueTemplate } from './types';
 
 export function PlaquePreview({design}:{design:PlaqueDesign}){
@@ -14,13 +14,14 @@ export function PlaquePreview({design}:{design:PlaqueDesign}){
   const names=normalizedText(design.names)||'Names',date=normalizedText(design.date)||'Event date';
   const size=(text:string,field:'names'|'date')=>font?fitTextWithMetrics(text,field,design.font,(value,fontSize)=>font.getAdvanceWidth(value,fontSize,{kerning:true}),design.templateId):fitText(text,field,design.font,design.templateId);
   const face=fontCatalog[design.font],detail=colours[design.detailColour].value;
+  const textStroke=2*textExpansionForFont(design.font);
   return <figure className="preview-frame" aria-label="Live plaque preview"><div className="preview-stage"><svg className="plaque" viewBox="0 0 120 70" role="img" aria-labelledby="preview-title preview-description">
     <title id="preview-title">{template.title} wedding plaque</title><desc id="preview-description">A 120 by 70 millimetre plaque showing {names} and {date}.</desc>
     <defs><filter id="raised" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx=".45" dy=".75" stdDeviation=".45" floodColor="#000" floodOpacity=".7"/><feDropShadow dx="-.2" dy="-.25" stdDeviation=".18" floodColor="#fff" floodOpacity=".28"/></filter></defs>
     <rect width="120" height="70" rx="4" fill={colours[design.baseColour].value}/><g fill={detail} stroke={detail} filter="url(#raised)">
       {renderBorder(design.border)}{renderIntegrated(template)}
-      <text x={template.fields.names.x} y={template.fields.names.baselineY} textAnchor={template.fields.names.align==='left'?'start':'middle'} fontFamily={face.family} fontWeight={face.weight} fontSize={size(names,'names')} stroke="none">{names}</text>
-      <text x={template.fields.date.x} y={template.fields.date.baselineY} textAnchor={template.fields.date.align==='left'?'start':'middle'} fontFamily={face.family} fontWeight={face.weight} fontSize={size(date,'date')} stroke="none">{date}</text>
+      <text x={template.fields.names.x} y={template.fields.names.baselineY} textAnchor={template.fields.names.align==='left'?'start':'middle'} fontFamily={face.family} fontWeight={face.weight} fontSize={size(names,'names')} strokeWidth={textStroke} strokeLinejoin="round" paintOrder="stroke">{names}</text>
+      <text x={template.fields.date.x} y={template.fields.date.baselineY} textAnchor={template.fields.date.align==='left'?'start':'middle'} fontFamily={face.family} fontWeight={face.weight} fontSize={size(date,'date')} strokeWidth={textStroke} strokeLinejoin="round" paintOrder="stroke">{date}</text>
       {design.ornament==='heart'&&<polygon points={pointsAttribute(heartPoints)} transform={`translate(${template.heart.x-60} ${template.heart.y-39})`} stroke="none"/>}
     </g><rect x="8" y="8" width="104" height="54" rx="1.5" fill="none" stroke="rgba(255,255,255,.15)" strokeWidth=".25" strokeDasharray="1.2 1.2" className="safe-area"/>
   </svg></div><figcaption><span>{template.title}</span><span>{template.widthMm} × {template.heightMm} × {template.baseThicknessMm+template.detailHeightMm} mm</span></figcaption></figure>;

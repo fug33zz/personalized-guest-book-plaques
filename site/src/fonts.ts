@@ -14,3 +14,4 @@ export const fontCatalog:Record<FontId,{label:string;family:string;weight:number
 };
 export const fontIds=Object.keys(fontCatalog) as FontId[];
 export const fontLabels=Object.fromEntries(fontIds.map((id)=>[id,fontCatalog[id].label])) as Record<FontId,string>;
+export function textExpansionForFont(id:FontId){return fontCatalog[id].category==='Script'?.3:.14;}
